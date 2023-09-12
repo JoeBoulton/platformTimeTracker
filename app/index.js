@@ -88,11 +88,7 @@ const index = () => {
             type={step.type}
           />
         ))}
-        <PrimaryButton
-          handleSubmit={handleSubmit}
-          text="Login"
-          loading={loading}
-        />
+        <PrimaryButton onPress={handleSubmit} text="Login" loading={loading} />
       </View>
     </View>
   );
