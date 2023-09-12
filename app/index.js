@@ -38,7 +38,17 @@ const InputComponent = ({ text, onChange, type }) => {
 const index = () => {
   const [loginInfo, setLoginInfo] = useState({ email: '', password: '' });
   const [loading, setLoading] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
 
+  useEffect(() => {
+    const splashTimer = setTimeout(() => {
+      setShowSplash(false);
+    }, 6000); // 6 seconds
+
+    return () => {
+      clearTimeout(splashTimer);
+    };
+  }, []);
   const handleInputChange = (label, value) => {
     setLoginInfo((prev) => ({
       ...prev,

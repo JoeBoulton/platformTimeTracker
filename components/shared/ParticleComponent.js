@@ -23,25 +23,29 @@ const ParticleComponent = () => {
     Array.from({ length: 25 }, generateParticle)
   );
 
+  const startAnimation = (particle) => {
+    const newPosX = Math.random() * width;
+    const newPosY = Math.random() * height;
+    Animated.timing(particle.position.x, {
+      toValue: newPosX,
+      duration: 4000,
+      useNativeDriver: true,
+    }).start();
+    Animated.timing(particle.position.y, {
+      toValue: newPosY,
+      duration: 4000,
+      useNativeDriver: true,
+    }).start();
+
+    return particle;
+  };
+
   useEffect(() => {
+    // Start animation immediately for each particle
+    setParticles((prevParticles) => prevParticles.map(startAnimation));
+
     const interval = setInterval(() => {
-      setParticles((prevParticles) =>
-        prevParticles.map((particle) => {
-          const newPosX = Math.random() * width;
-          const newPosY = Math.random() * height;
-          Animated.timing(particle.position.x, {
-            toValue: newPosX,
-            duration: 4000,
-            useNativeDriver: true,
-          }).start();
-          Animated.timing(particle.position.y, {
-            toValue: newPosY,
-            duration: 4000,
-            useNativeDriver: true,
-          }).start();
-          return particle;
-        })
-      );
+      setParticles((prevParticles) => prevParticles.map(startAnimation));
     }, 4000);
 
     return () => clearInterval(interval);

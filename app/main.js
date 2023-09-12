@@ -27,7 +27,9 @@ const Main = () => {
   }, [startTime]);
 
   const handleStart = () => {
-    setStartTime(new Date());
+    const now = new Date();
+    setStartTime(now);
+    setCurrentTime(now);
   };
 
   const handleStop = async () => {

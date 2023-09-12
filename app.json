@@ -7,7 +7,30 @@
     "plugins": [
       "expo-router"
     ],
-    "name": "platformTimeTracker",
-    "slug": "platformTimeTracker"
+    "splash": {
+      "image": "./assets/platformOMS.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#fff"
+    },
+    "name": "Platform Time Tracker",
+    "slug": "platformTimeTracker",
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "b23fcc44-c9f7-4c0d-9a0c-72b5ac74b345"
+      }
+    },
+    "ios": {
+      "bundleIdentifier": "com.joeboulton123.platformTimeTracker"
+    },
+    "runtimeVersion": {
+      "policy": "sdkVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/b23fcc44-c9f7-4c0d-9a0c-72b5ac74b345"
+    },
+    "android": {}
   }
 }
