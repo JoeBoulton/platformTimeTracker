@@ -17,23 +17,7 @@ import axios from 'axios';
 import platformSplash from '../assets/platformOMS.png';
 import ParticleComponent from '../components/shared/ParticleComponent';
 import PrimaryButton from '../components/shared/PrimaryButton';
-
-const InputComponent = ({ text, onChange, type }) => {
-  return (
-    <View className="w-full items-center justify-center mb-4">
-      <View className="w-[80%]">
-        <Text className="text-black text-2xl font-light mb-2">{text}</Text>
-      </View>
-      <TextInput
-        className="bg-gray-200 border text-black w-[80%] px-2 py-2 rounded-md text-lg"
-        style={{ lineHeight: 25 }}
-        onChangeText={onChange}
-        keyboardType={type === 'email' ? 'email-address' : 'default'}
-        secureTextEntry={type === 'password'}
-      />
-    </View>
-  );
-};
+import InputComponent from '../components/shared/InputComponent';
 
 const index = () => {
   const [loginInfo, setLoginInfo] = useState({ email: '', password: '' });
@@ -88,7 +72,7 @@ const index = () => {
           />
         </View>
         {[
-          { label: 'Email', type: 'email' },
+          { label: 'Email', type: 'email-address' },
           { label: 'Password', type: 'password' },
         ].map((step) => (
           <InputComponent

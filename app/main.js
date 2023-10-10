@@ -1,114 +1,143 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text } from 'react-native';
-import { AnimatedCircularProgress } from 'react-native-circular-progress';
+import React, { useState } from 'react';
+import { View, Text, TextInput } from 'react-native';
 import ParticleComponent from '../components/shared/ParticleComponent';
+import TimerComponent from '../components/shared/TimerComponent';
+import TravelTimeComponent from '../components/shared/TravelTimeComponent';
+import moment from 'moment';
 import PrimaryButton from '../components/shared/PrimaryButton';
-import SecondaryButton from '../components/shared/SecondaryButton';
-import axios from 'axios';
+
+const formatTime = (label, seconds) => {
+  const duration = moment.duration(seconds, 'seconds');
+  const hours = String(duration.hours()).padStart(2, '0');
+  const minutes = String(duration.minutes()).padStart(2, '0');
+  return `${hours}:${minutes}:${
+    label === 'Total Elapsed Time' ? seconds : '00'
+  }`;
+};
+
+const splitTime = (totalSeconds) => {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds - hours * 3600) / 60);
+  const seconds = totalSeconds % 60;
+  return { hours, minutes, seconds };
+};
+
+const TimeDisplay = ({ label, time }) => (
+  <Text>
+    {label}: {formatTime(label, time)}
+  </Text>
+);
 
 const Main = () => {
-  const [startTime, setStartTime] = useState(null);
-  const [endTime, setEndTime] = useState(null);
-  const [currentTime, setCurrentTime] = useState(null);
-  const [timer, setTimer] = useState(null);
+  const [step, setStep] = useState(0);
+  const [initialTravelTime, setInitialTravelTime] = useState(0);
+  const [timerStartEnd, setTimerStartEnd] = useState({
+    totalElapsedSeconds: 0,
+  });
+  const [returnTravelTime, setReturnTravelTime] = useState(0);
 
-  const maxTimeInSeconds = 43200; // 12 hours in seconds
-
-  useEffect(() => {
-    if (startTime) {
-      setTimer(
-        setInterval(() => {
-          setCurrentTime(new Date());
-        }, 1000)
-      );
-    }
-
-    return () => clearInterval(timer);
-  }, [startTime]);
-
-  const handleStart = () => {
-    const now = new Date();
-    setStartTime(now);
-    setCurrentTime(now);
+  const handleTimeChange = (type, value) => {
+    if (type === 'Initial') setInitialTravelTime(value);
+    if (type === 'Return') setReturnTravelTime(value);
+    if (type === 'Elapsed') setTimerStartEnd({ totalElapsedSeconds: value });
+  };
+  console.log(returnTravelTime);
+  const handleTimer = (start, end, totalElapsedSeconds) => {
+    setTimerStartEnd({ start, end, totalElapsedSeconds });
+    setStep(2);
   };
 
-  const handleStop = async () => {
-    setEndTime(new Date());
-    clearInterval(timer);
-
-    try {
-      const response = await axios.post('https://mockapi.com/endpoint', {
-        startTime,
-        endTime: new Date(),
-        userId: '12345', // Replace with the actual userId
-      });
-
-      console.log('Data submitted successfully:', response.data);
-    } catch (error) {
-      console.error('Error submitting data:', error);
-    }
-
-    setStartTime(null);
-    setCurrentTime(null);
-    setEndTime(null);
+  const handleSubmit = () => {
+    // Your submit logic here
+  };
+  // Function to handle TextInput changes for times
+  const handleFinalTimeChange = (type, key, value) => {
+    // Limit the maximum hours to 12
+    // console.log(type, key, value);
+    // if(type==='')
+    // if (type === 'Initial') setInitialTravelTime(totalSeconds / 60);
+    // if (type === 'Return') setReturnTravelTime(totalSeconds / 60);
   };
 
-  const elapsedTimeInSeconds = startTime
-    ? Math.floor((currentTime - startTime) / 1000)
-    : 0;
-
-  const formatTime = (seconds) => {
-    const hours = String(Math.floor(seconds / 3600)).padStart(2, '0');
-    const minutes = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
-    const secs = String(seconds % 60).padStart(2, '0');
-    return `${hours}:${minutes}:${secs}`;
-  };
+  const allValuesSet = initialTravelTime && returnTravelTime;
 
   return (
     <View className="flex flex-1 mx-2">
       <ParticleComponent />
       <View className="flex-1 space-y-4">
-        <Text className="text-3xl font-semibold">Welcome Back,</Text>
-        <View className="flex flex-1 bg-white/90 mx-5 shadow-md rounded-md justify-between pb-10 ">
-          <View className="p-4 flex-1">
-            <View className="flex flex-row items-center space-x-2">
-              <Text className="text-2xl font-semibold">Start Time:</Text>
-              <Text className="text-2xl font-light">
-                {startTime ? startTime.toLocaleTimeString() : 'TBC'}
-              </Text>
+        <View className="p-4">
+          {!allValuesSet && (
+            <>
+              <TimeDisplay
+                label="Initial Travel Time"
+                time={initialTravelTime * 60 * 60}
+              />
+              <TimeDisplay
+                label="Total Elapsed Time"
+                time={timerStartEnd.totalElapsedSeconds}
+              />
+              <TimeDisplay
+                label="Return Travel Time"
+                time={returnTravelTime * 60 * 60}
+              />
+            </>
+          )}
+        </View>
+        <View className="flex flex-1 bg-white/90 mx-5 shadow-md rounded-md justify-center pb-10 items-center">
+          {allValuesSet ? (
+            <View className="flex flex-col items-center">
+              {['Initial', 'Elapsed', 'Return'].map((type) => {
+                const time =
+                  type === 'Initial'
+                    ? initialTravelTime * 60 * 60
+                    : type === 'Return'
+                    ? returnTravelTime * 60 * 60
+                    : timerStartEnd.totalElapsedSeconds;
+                const { hours, minutes, seconds } = splitTime(time);
+
+                return (
+                  <View
+                    key={type}
+                    className="flex-row justify-center items-center space-x-2 mb-2"
+                  >
+                    <Text className="text-lg font-semibold">{`${type} Travel Time:`}</Text>
+                    <View className="flex-row p-2">
+                      <Text className="text-lg">{String(hours)}</Text>
+
+                      <Text className="text-lg">:</Text>
+                      <Text className="text-lg">{String(minutes)}</Text>
+
+                      <Text className="text-lg">:</Text>
+                      <Text className="text-lg">{String(seconds)}</Text>
+                    </View>
+                  </View>
+                );
+              })}
+              <PrimaryButton text="Submit" onPress={handleSubmit} />
             </View>
-            <View className="flex flex-row items-center space-x-2">
-              <Text className="text-2xl font-semibold">End Time:</Text>
-              <Text className="text-2xl font-light">TBC</Text>
-            </View>
-            <View className="items-center justify-center pt-2 flex-1">
-              <AnimatedCircularProgress
-                size={250}
-                width={12}
-                fill={
-                  startTime
-                    ? (elapsedTimeInSeconds / maxTimeInSeconds) * 100
-                    : 0
-                }
-                tintColor="#d4af37"
-                backgroundColor="#000"
-                rotation={360}
-              >
-                {(fill) => (
-                  <Text className="text-4xl font-light">
-                    {startTime ? formatTime(elapsedTimeInSeconds) : '00:00:00'}
-                  </Text>
-                )}
-              </AnimatedCircularProgress>
-            </View>
-          </View>
-          <View className="justify-center items-center">
-            {startTime ? (
-              <SecondaryButton text="Stop" onPress={handleStop} />
-            ) : (
-              <PrimaryButton text="Start Timer" onPress={handleStart} />
-            )}
-          </View>
+          ) : (
+            <>
+              {step === 0 && (
+                <TravelTimeComponent
+                  type="Initial"
+                  updateMainState={(value) => {
+                    setInitialTravelTime(value / 60);
+                    setStep(1);
+                  }}
+                />
+              )}
+              {step === 1 && <TimerComponent handleTimer={handleTimer} />}
+              {step === 2 && (
+                <TravelTimeComponent
+                  type="Return"
+                  updateMainState={(value) => {
+                    setReturnTravelTime(value / 60);
+                    setStep(3);
+                  }}
+                />
+              )}
+            </>
+          )}
         </View>
       </View>
     </View>

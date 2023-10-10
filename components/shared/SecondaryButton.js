@@ -1,7 +1,7 @@
 import { View, Text, TouchableOpacity, ActivityIndicator } from 'react-native';
 import React from 'react';
 
-const PrimaryButton = ({ loading, onPress, text }) => {
+const SecondaryButton = ({ loading, onPress, text }) => {
   return (
     <View className="flex flex-row w-[80%] justify-between ">
       <TouchableOpacity
@@ -20,4 +20,4 @@ const PrimaryButton = ({ loading, onPress, text }) => {
   );
 };
 
-export default PrimaryButton;
+export default SecondaryButton;
